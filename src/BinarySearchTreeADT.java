@@ -16,4 +16,25 @@ public interface BinarySearchTreeADT<K, V> {
     public void postOrder();
 
     public void levelOrder();
+
+    // Contratos não implementados
+    public int countNodes();
+
+    public int countInternalNodes();
+
+    public int countLeaves();
+
+    public int degree(K key);
+
+    public int degreeTree();
+
+    public int height(K key);
+
+    public int heightTree();
+
+    public int depth(K key);
+
+    public String ancestors(K key);
+
+    public String descendents(K key);
 }
