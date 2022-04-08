@@ -1,3 +1,9 @@
+/**
+ * Group: 4;
+ * <p>
+ * Authors: Álvaro Boschi, Christian Aguiar Plentz, Erick Oliveira Schneider, Lucas Sbardelotto Ali, Renan Zampeze, Álvaro Boschi;
+ */
+
 public class BinarySearchTree<K extends Comparable<K>, V> implements BinarySearchTreeADT<K, V> {
     protected Node<K, V> root;
 
@@ -129,62 +135,71 @@ public class BinarySearchTree<K extends Comparable<K>, V> implements BinarySearc
         return countNodes(root);
     }
 
-    private int countNodes(Node<K, V> node){
+    private int countNodes(Node<K, V> node) {
         int count = 0;
-        if (node != null){
+        if (node != null) {
             count++;
-            count+=countNodes(node.getRight()); //Se o node nao for null, vai ser adicionado no count
-            count+=countNodes(node.getLeft());
+            count += countNodes(node.getRight()); //Se o node nao for null, vai ser adicionado no count
+            count += countNodes(node.getLeft());
         }
-        return count;
+        return count; // Retorna o count para a recursividade
     }
 
     @Override
     public int countInternalNodes() {
-        return countInternalNodes(root)-1;
+        return countInternalNodes(root) - 1;
     }
 
-    private int countInternalNodes(Node<K, V> node){
+    private int countInternalNodes(Node<K, V> node) {
         int count = 0;
-        if (node != null && !node.isLeaf()){
+        if (node != null && !node.isLeaf()) { // Verifica se o node não é folha para contar só os internos.
             count++;
-            count+=countInternalNodes(node.getRight());
-            count+=countInternalNodes(node.getLeft());
+            count += countInternalNodes(node.getRight());
+            count += countInternalNodes(node.getLeft());
         }
         return count;
     }
 
+    /* Pelo motivo de simplesmente o isLeaf, se posto como nao sendo o inverso
+     * em um if, pelo fato de comecar no root e nao ser leaf, ele simplesmente
+     * nao roda o if e retorna zero, tentei fazer um if node == root para fazer
+     * o if rodar mas ai so retorna 1 por que ele so checa o root e nao os outros
+     * eu entao tive que fazer o inverso do resultado do count internal nodes para fazer
+     * funcionar.
+     */
     @Override
     public int countLeaves() {
-        return countLeaves(root);
+        return countNodes(root) - countLeaves(root);
     }
 
-    private int countLeaves(Node<K, V> node){
+    public int countLeaves(Node<K, V> node) {
         int count = 0;
-        if (node != null && node.isLeaf() || node == root){  //o codigo precisa escalar o node root se nao vai dar 0
-            count++;                                         //mas ainda nao funciona pois eu tenho certeza que o
-            count+=countLeaves(node.getRight());             //count so contou o root e nao o leaf
-            count+=countLeaves(node.getLeft());
+        if (node != null && !node.isLeaf()) {
+            count++;
+            count += countInternalNodes(node.getRight());
+            count += countInternalNodes(node.getLeft());
         }
         return count;
     }
 
     @Override
     public int degree(K key) {
-        //QUANDO ENCONTRAR O NÓ QUE CORRESPONDE À CHAVE, VER QUANTOS FILHOS TEM 0 - 2
-        Node<K,V> node = searchNode(root, key);
-        if(node == null){return -1;}
-        int cont = 0;
-        if(node.getLeft() != null){
-            cont ++;
+        //Quando encontrar o nó que corresponde a chave, ver quantos filhos tem (0 - 2)
+        Node<K, V> node = searchNode(root, key);
+        int count = 0;
+        if (node == null) {
+            return -1;
         }
-        if(node.getRight() != null){
-            cont ++;
+        if (node.getLeft() != null) {
+            count++;
         }
-        return cont;
+        if (node.getRight() != null) {
+            count++;
+        }
+        return count;
     }
 
-    private Node<K,V> searchNode(Node<K,V> node, K key) {
+    private Node<K, V> searchNode(Node<K, V> node, K key) { // Retorna o node que tem a key passada por parâmetro
         if (node == null) {
             return null;
         } else if (key.equals(node.getKey())) {
@@ -196,19 +211,21 @@ public class BinarySearchTree<K extends Comparable<K>, V> implements BinarySearc
     @Override
     public int degreeTree() {
         int degree = 0;
-        if(isEmpty()){return -1;}
+        if (isEmpty()) {
+            return -1; // Se a tree estiver vazia o grau é -1
+        }
         return searchDegreeTree(root, degree);
     }
 
-    private int searchDegreeTree(Node<K,V> node, int degreeTree) {
-        if(node != null){
-            if(node.getLeft() != null && node.getRight() != null){
+    private int searchDegreeTree(Node<K, V> node, int degreeTree) {
+        if (node != null) {
+            if (node.getLeft() != null && node.getRight() != null) {
                 return 2;
             }
-            if(node.getLeft() != null){
+            if (node.getLeft() != null) {
                 return searchDegreeTree(node.next(node.getKey()), degreeTree);
             }
-            if(node.getRight() != null){
+            if (node.getRight() != null) {
                 return searchDegreeTree(node.next(node.getKey()), degreeTree++);
             }
         }
@@ -218,14 +235,18 @@ public class BinarySearchTree<K extends Comparable<K>, V> implements BinarySearc
     @Override
     public int height(K key) {
         //QUANDO ENCONTRAR O NÓ QUE CORRESPONDE À CHAVE, VER QUANTOS FILHOS TEM 0 - 2
-        if(isEmpty()){return -1;}
-        Node<K,V> node = searchNode(root, key);
-        if(node == null){return -1;}
-        return searchHeight(root, key, 0)-1;
+        if (isEmpty()) {
+            return -1;
+        }
+        Node<K, V> node = searchNode(root, key);
+        if (node == null) {
+            return -1;
+        }
+        return searchHeight(root, key, 0) - 1;
     }
 
-    private int searchHeight(Node<K,V> node, K key, int count) {
-        count ++;
+    private int searchHeight(Node<K, V> node, K key, int count) {
+        count++;
         if (key.equals(node.getKey())) {
             return count;
         }
@@ -234,36 +255,41 @@ public class BinarySearchTree<K extends Comparable<K>, V> implements BinarySearc
 
     @Override
     public int heightTree() {
-        if(isEmpty()){return -1;}
+        if (isEmpty()) {
+            return -1;
+        }
         return searchHeightTree(root);
     }
 
-    private int searchHeightTree(Node<K,V> node){
-        if(node != null){
+    private int searchHeightTree(Node<K, V> node) {
+        if (node != null) {
 
             int left = searchHeightTree(node.getLeft());
             int right = searchHeightTree(node.getRight());
 
-            if (right<left){return left+1;}
-            return right+1;
+            if (right < left) {
+                return left + 1;
+            }
+            return right + 1;
+        } else {
+            return -1;
         }
-        else{return -1;}
     }
 
     @Override
     public int depth(K key) {
         //QUANDO ENCONTRAR O NÓ QUE CORRESPONDE À CHAVE, VER QUANTOS FILHOS TEM 0 - 2
-        if(isEmpty()) {
+        if (isEmpty()) {
             return -1;
         }
-        Node<K,V> node = searchNode(root, key);
-        if(node == null){
+        Node<K, V> node = searchNode(root, key);
+        if (node == null) {
             return -1;
         }
-        return searchDepth(root, key, 0)-1;
+        return searchDepth(root, key, 0) - 1;
     }
 
-    private int searchDepth(Node<K,V> node, K key, int count) {
+    private int searchDepth(Node<K, V> node, K key, int count) {
         count++;
         if (key.equals(node.getKey())) {
             return count;
@@ -274,14 +300,18 @@ public class BinarySearchTree<K extends Comparable<K>, V> implements BinarySearc
     @Override
     public String ancestors(K key) {
         //QUANDO ENCONTRAR O NÓ QUE CORRESPONDE À CHAVE, VER QUANTOS FILHOS TEM 0 - 2
-        if(isEmpty()){return null;}
-        Node<K,V> node = searchNode(root, key);
-        if(node == null){return null;}
+        if (isEmpty()) {
+            return null;
+        }
+        Node<K, V> node = searchNode(root, key);
+        if (node == null) {
+            return null;
+        }
         return searchAncestors(root, key, "");
     }
 
-    private String searchAncestors(Node<K,V> node, K key, String a) {
-        a += node.getKey()+" ";
+    private String searchAncestors(Node<K, V> node, K key, String a) {
+        a += node.getKey() + " ";
         if (key.equals(node.getKey())) {
             return a;
         }
@@ -291,9 +321,13 @@ public class BinarySearchTree<K extends Comparable<K>, V> implements BinarySearc
     @Override
     public String descendents(K key) {
         //QUANDO ENCONTRAR O NÓ QUE CORRESPONDE À CHAVE, VER QUANTOS FILHOS TEM 0 - 2
-        if(isEmpty()){return null;}
-        Node<K,V> node = searchNode(root, key);
-        if(node == null){return null;}
+        if (isEmpty()) {
+            return null;
+        }
+        Node<K, V> node = searchNode(root, key);
+        if (node == null) {
+            return null;
+        }
 
         return searchDescendents(root, key, "", false);
     }
@@ -332,13 +366,13 @@ public class BinarySearchTree<K extends Comparable<K>, V> implements BinarySearc
         return descendents;
     }*/
 
-    private String searchDescendents(Node<K,V> node, K key, String descendents, boolean verifyKey){
-        if(node != null){
+    private String searchDescendents(Node<K, V> node, K key, String descendents, boolean verifyKey) {
+        if (node != null) {
             if (key.equals(node.getKey())) {
                 verifyKey = true;
             }
-            if(verifyKey){
-                descendents += node.getKey()+" ";
+            if (verifyKey) {
+                descendents += node.getKey() + " ";
             }
             searchDescendents(node.getLeft(), key, descendents, verifyKey);
             searchDescendents(node.getRight(), key, descendents, verifyKey);
